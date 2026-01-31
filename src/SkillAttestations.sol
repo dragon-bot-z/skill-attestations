@@ -15,14 +15,14 @@ contract SkillAttestations {
 
     /// @notice Skill attestation data
     struct SkillData {
-        bytes32 skillHash;      // IPFS CID as bytes32 (keccak256 of CID)
-        string skillName;       // Human-readable name
-        string skillUrl;        // Repository URL
-        string version;         // Version string
-        uint8 rating;           // 1-5 rating
-        bool safe;              // Is skill safe?
-        string findings;        // Audit findings summary
-        string permissions;     // Required permissions
+        bytes32 skillHash; // IPFS CID as bytes32 (keccak256 of CID)
+        string skillName; // Human-readable name
+        string skillUrl; // Repository URL
+        string version; // Version string
+        uint8 rating; // 1-5 rating
+        bool safe; // Is skill safe?
+        string findings; // Audit findings summary
+        string permissions; // Required permissions
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -31,12 +31,12 @@ contract SkillAttestations {
 
     /// @notice EAS contract on Base
     IEAS public constant EAS = IEAS(0x4200000000000000000000000000000000000021);
-    
+
     /// @notice Schema Registry on Base
     ISchemaRegistry public constant SCHEMA_REGISTRY = ISchemaRegistry(0x4200000000000000000000000000000000000020);
 
     /// @notice Schema string for skill attestations
-    string public constant SKILL_SCHEMA = 
+    string public constant SKILL_SCHEMA =
         "bytes32 skillHash,string skillName,string skillUrl,string version,uint8 rating,bool safe,string findings,string permissions";
 
     /*//////////////////////////////////////////////////////////////
@@ -101,10 +101,10 @@ contract SkillAttestations {
     /// @notice Register the skill attestation schema on EAS
     function registerSchema() external returns (bytes32 uid) {
         if (schemaUID != bytes32(0)) revert SchemaAlreadyRegistered();
-        
+
         uid = SCHEMA_REGISTRY.register(SKILL_SCHEMA, address(0), true);
         schemaUID = uid;
-        
+
         emit SchemaRegistered(uid);
     }
 
@@ -115,26 +115,26 @@ contract SkillAttestations {
     /// @notice Register as auditor with stake
     function registerAuditor() external payable {
         if (msg.value < MIN_STAKE) revert InsufficientStake();
-        
+
         auditors[msg.sender] = true;
         auditorStakes[msg.sender] += msg.value;
-        
+
         emit AuditorRegistered(msg.sender, msg.value);
     }
 
     /// @notice Remove auditor and return stake (owner only)
     function removeAuditor(address auditor) external {
         if (msg.sender != owner) revert NotOwner();
-        
+
         uint256 stake = auditorStakes[auditor];
         auditors[auditor] = false;
         auditorStakes[auditor] = 0;
-        
+
         if (stake > 0) {
-            (bool ok, ) = auditor.call{value: stake}("");
+            (bool ok,) = auditor.call{value: stake}("");
             if (!ok) revert TransferFailed();
         }
-        
+
         emit AuditorRemoved(auditor);
     }
 
@@ -166,20 +166,17 @@ contract SkillAttestations {
             AttestationRequest({
                 schema: schemaUID,
                 data: AttestationRequestData({
-                    recipient: address(0),
-                    expirationTime: 0,
-                    revocable: true,
-                    refUID: bytes32(0),
-                    data: data,
-                    value: 0
+                    recipient: address(0), expirationTime: 0, revocable: true, refUID: bytes32(0), data: data, value: 0
                 })
             })
         );
-        
+
         // Track attestation
         skillAttestations[skill.skillHash].push(attestationUID);
-        unchecked { auditorAttestationCount[msg.sender]++; }
-        
+        unchecked {
+            auditorAttestationCount[msg.sender]++;
+        }
+
         emit SkillAttested(skill.skillHash, attestationUID, msg.sender);
     }
 

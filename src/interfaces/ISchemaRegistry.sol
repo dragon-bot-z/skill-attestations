@@ -17,11 +17,7 @@ interface ISchemaRegistry {
     /// @param resolver Optional resolver contract address
     /// @param revocable Whether attestations using this schema can be revoked
     /// @return The UID of the registered schema
-    function register(
-        string calldata schema,
-        address resolver,
-        bool revocable
-    ) external returns (bytes32);
+    function register(string calldata schema, address resolver, bool revocable) external returns (bytes32);
 
     /// @notice Get a schema record by UID
     function getSchema(bytes32 uid) external view returns (SchemaRecord memory);

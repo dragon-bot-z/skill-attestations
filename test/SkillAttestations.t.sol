@@ -3,7 +3,13 @@ pragma solidity ^0.8.20;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {SkillAttestations} from "../src/SkillAttestations.sol";
-import {IEAS, AttestationRequest, AttestationRequestData, Attestation, RevocationRequest} from "../src/interfaces/IEAS.sol";
+import {
+    IEAS,
+    AttestationRequest,
+    AttestationRequestData,
+    Attestation,
+    RevocationRequest
+} from "../src/interfaces/IEAS.sol";
 import {ISchemaRegistry, SchemaRecord} from "../src/interfaces/ISchemaRegistry.sol";
 
 /// @notice Mock EAS for testing
@@ -47,20 +53,11 @@ contract MockSchemaRegistry is ISchemaRegistry {
     uint256 private _schemaCounter;
     mapping(bytes32 => SchemaRecord) private _schemas;
 
-    function register(
-        string calldata schema,
-        address resolver,
-        bool revocable
-    ) external returns (bytes32) {
+    function register(string calldata schema, address resolver, bool revocable) external returns (bytes32) {
         _schemaCounter++;
         bytes32 uid = keccak256(abi.encodePacked(_schemaCounter, schema));
 
-        _schemas[uid] = SchemaRecord({
-            uid: uid,
-            resolver: resolver,
-            revocable: revocable,
-            schema: schema
-        });
+        _schemas[uid] = SchemaRecord({uid: uid, resolver: resolver, revocable: revocable, schema: schema});
 
         return uid;
     }
